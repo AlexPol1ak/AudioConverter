@@ -2,8 +2,10 @@
 # from django.contrib.auth.models import User
 from django.shortcuts import redirect, render, reverse
 # from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
 
-from .forms import UploadFileForm, SelectFormatForm
+from .forms import UploadFileForm, SelectFormatForm, RegisterUserForm
 from .audiohandler.audio import AudioConverter
 from .utils.database import write_database
 from AudioConverter.settings import STATIC_URL # файлы статики
@@ -64,8 +66,19 @@ def upload_file(request):
 def user_account(request):
     return render(request, 'AudioApp/user.html')
 
-def user_reg(request):
-    return render(request, 'AudioApp/registration.html')
+class RegisterUser(CreateView):
+    """Регистрация пользователя."""
+    form_class = RegisterUserForm
+    template_name = 'AudioApp/registration.html'
+    success_url = reverse_lazy('user_page')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Регистрация'
+        print(context)
+        return context
+
+
 
 def about(request):
     return render(request, 'AudioApp/about.html')
@@ -74,7 +87,10 @@ def deletion_page(request):
     return render(request, 'AudioApp/deletion.html')
 
 def login(request):
-    return render(request, 'AudioApp/login.html')
+    return render(request, 'AudioApp/authorization.html')
+
+def user_page(request):
+    return render(request, 'AudioApp/userpage.html')
 
 
 
