@@ -1,11 +1,13 @@
 
 # from django.contrib.auth.models import User
+from django.contrib.auth import login, logout
+from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render, reverse
 # from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
-from .forms import UploadFileForm, SelectFormatForm, RegisterUserForm
+from .forms import UploadFileForm, SelectFormatForm, RegisterUserForm, LoginUserForm
 from .audiohandler.audio import AudioConverter
 from .utils.database import write_database
 from AudioConverter.settings import STATIC_URL # файлы статики
@@ -75,8 +77,13 @@ class RegisterUser(CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Регистрация'
-        print(context)
         return context
+
+    def form_valid(self, form):
+        """Авторизовывает при успешной регистрации."""
+        user = form.save()
+        login(self.request, user)
+        return redirect('user_page')
 
 
 
@@ -86,8 +93,34 @@ def about(request):
 def deletion_page(request):
     return render(request, 'AudioApp/deletion.html')
 
-def login(request):
-    return render(request, 'AudioApp/authorization.html')
+# def login(request):
+#     return render(request, 'AudioApp/login.html')
+
+class Login(LoginView):
+    """Авторизация пользователя."""
+    form_class= LoginUserForm
+    template_name = 'AudioApp/login.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        """Добавление контекста в шаблон."""
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Авторизация'
+
+        return context
+
+    def get_success_url(self):
+        """Перенаправление пользователя на страницу профиля."""
+        return reverse('user_page')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('home')
+
+
+
+
+
 
 def user_page(request):
     return render(request, 'AudioApp/userpage.html')

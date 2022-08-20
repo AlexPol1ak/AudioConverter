@@ -3,6 +3,9 @@
 {% block title %}Авторизация  и регистрация {% endblock %}
 
 {% block content %}
+{% if request.user.is_authenticated %}
+<meta HTTP-EQUIV="REFRESH" content="0; url={% url 'user_page' %}">
+{% else %}
 <div class="features">
     <br>
     <center>
@@ -20,4 +23,5 @@
     </center>
     </p>
 </div>
+{% endif %}
 {% endblock %}

@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Стараница пользвателЯ</title>
-</head>
-<body>
+{% extends 'AudioApp/layout.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block content %}
+<div class="features">
+    <center><h2>Привет, {{user.username.title}}</h2></center>
+    <input type="button" class="btn btn-warning" value="Выйти" onclick='location.href="{% url "logout_user" %}"'>
+    <p></p>
+</div>
+
+{% endblock %}
