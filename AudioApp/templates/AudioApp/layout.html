@@ -21,12 +21,21 @@
         <ul>
             <a href="{% url 'home' %}"><li>Главная</li></a>
             <a href="{% url 'about' %}"><li>О нас</li></a>
-            <a href="{% url 'user_account' %}"><li>Кабинет пользователя</li></a>
+            <a href="{% url 'user_account' %}"><li>Личный кабинет</li></a>
 
         </ul>
     </aside>
 
     <main>
+
+        {% if  request.user.is_authenticated%}
+<center
+    <h4><font size="5" color="white"> Вы авторизованы как {{ request.user.username}} </font>
+        <input type="button" class="btn btn-warning" value="Выйти" onclick='location.href="{% url "logout_user" %}"'>
+    </h4>
+</center>
+
+{% endif %}
         {% block content %}
 
         {% endblock %}

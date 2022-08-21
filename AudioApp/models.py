@@ -1,8 +1,9 @@
 from django.db import models
+from django.urls import reverse
 
 
 class UserSong(models.Model):
-    """Модель для загрузки песни"""
+    """Модель для загрузки трека"""
     title = models.CharField(max_length=100)
     audio_file = models.FileField(upload_to='audio_files/')
 
@@ -22,6 +23,10 @@ class AudioData(models.Model):
 
     def __str__(self):
         return str(self.login)
+
+    def get_absolute_url(self):
+        """Возвращает url для объекта"""
+        return reverse('trek_name', kwargs={'trek_name': self.trek_name})
 
     class Meta:
         """Настройки модели"""

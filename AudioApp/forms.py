@@ -9,8 +9,13 @@ from AudioApp.models import UserSong
 from .audiohandler.audio import AudioConverter
 
 
-class UploadFileForm(forms.ModelForm):
+class UploadFileForm(forms.ModelForm, forms.Form):
     """Форма загрузки файла"""
+
+    converter_formats: list = AudioConverter.available_formats()
+    formats_tuple: tuple = tuple(zip(tuple(converter_formats), tuple(converter_formats)))
+
+    format: forms.Form = forms.ChoiceField(choices=formats_tuple)
 
     def clean_audio_file(self):
         """Проверка файла"""
@@ -20,7 +25,7 @@ class UploadFileForm(forms.ModelForm):
             if file.size > 10 * 1024 * 1024:
                 raise ValidationError("Audio file too large ( > 10mb )")
 
-            if not os.path.splitext(file.name)[1] in [".mp3", ".wav", '.ac3','.asf', '.Flac', '.mp4', '.mov', ".ogg"]:
+            if not os.path.splitext(file.name)[1] in ['.'+i for i in UploadFileForm.converter_formats]:
                 raise ValidationError("Doesn't have proper extension")
 
             return file
@@ -32,18 +37,14 @@ class UploadFileForm(forms.ModelForm):
         fields = ['audio_file']
 
 
-class SelectFormatForm(forms.Form):
-    """Форма выбора формата конвертирования."""
-
-    converter_formats :list = AudioConverter.available_formats()
-    formats_tuple :tuple = tuple(zip(tuple(converter_formats),tuple(converter_formats)))
-
-    format :forms.Form = forms.ChoiceField(choices=formats_tuple)
-
     def show_formats(self):
-        formats =", ".join(SelectFormatForm.converter_formats)
+        """Возвращает строку доступных форматов."""
+        formats =", ".join(UploadFileForm.converter_formats)
         formats += "."
+
         return formats
+
+
 
 class RegisterUserForm(UserCreationForm):
     """Форма регистрации пользователя."""

@@ -1,80 +1,81 @@
-
-# from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render, reverse
 # from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
-from .forms import UploadFileForm, SelectFormatForm, RegisterUserForm, LoginUserForm
-from .audiohandler.audio import AudioConverter
+from .forms import UploadFileForm, RegisterUserForm, LoginUserForm
 from .utils.database import write_database
-from AudioConverter.settings import STATIC_URL # файлы статики
-
-#Converter setiings
-settings = {
-        'move': True, # Перемещать (не копировать) файлы в папку конвертированных
-        'write_db': False, # Использовать стандартную базу данных конвертора
-        'db_path': '', # Путь к стандартной базе данных конвертора
-        'storage_path': f'AudioApp{STATIC_URL}', # Путь, где будут храниться конвертированные файлы
-        }
-#object converter
-converter = AudioConverter(setting_dict=settings)
+from .utils.converter import converter
 
 
-def upload_file(request):
-    """Загрузка аудио и его конвретирвоание."""
 
-    select = SelectFormatForm()
+def home_page(request):
+    """Представление для домашней страницы."""
 
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-
-        if form.is_valid():
-
-            form.save()
-            text :str= str(form.files['audio_file']).replace(' ', '_')
-            frmt = request.POST.get('format')
-
-            # Конвертирование аудиофайла и сохранение информации о нем в базу данных
-            trek_dict : dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name='Guest')
-            flag: bool = write_database(trek_dict)
-
-            # Инфа о файле в home.html
-            trek_name :str= trek_dict['trek_name']
-            trek_format :str = trek_dict['format']
-            audio :str= trek_dict['path_convert'].replace('AudioApp/static/', '')
-
-            context :dict = {'form': form,
-                       'trek_name': trek_name,
-                       'format': trek_format,
-                       'audio':audio,
-                       'select': select,
-                       }
-
-            return render(request,  'AudioApp/home.html', context=context)
-            # return redirect('home')
-    else:
+    if request.method !='POST':
         form = UploadFileForm()
-        context :dict = {'form': form,
-                        'select': select,
-                         }
+        context = {'form': form}
 
-        return render(request, 'AudioApp/home.html',context=context)
+    else:
+        # Если пользватель зарегистирован ,получаем его имя и логин
+        if request.user.is_authenticated:
+            login :str = request.user.username
+            name :str = request.user.first_name
+        # Если нет, инициализируем его как гостя
+        else:
+            login = 'Guest'
+            name = None
+        # Получаем данные из формы
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+
+        # Получаем имя файла и выбраный пользвателем формат конвертации
+        text :str = str(form.files['audio_file']).replace(' ', '_')
+        frmt :str = request.POST.get('format')
+
+        # Конвертирование аудиофайла и сохранение информации о нем в базу данных
+
+        trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
+        flag: bool = write_database(trek_dict)
+
+        # Информация о конвертированном файле для контекста
+        trek_name: str = trek_dict['trek_name']
+        trek_format: str = trek_dict['format']
+        audio: str = trek_dict['path_convert'].replace('AudioApp/static/', '')
+
+        # формируем контекст для представления
+        context = {'form': form, # форма загрузки файла
+                    'trek_name': trek_name, # имя сконвертированного файла
+                    'format': trek_format, # формат сконвертированного файла
+                    'audio': audio, # путь к сконвертированному файлу
+                    'name': name # имя пользователя
+                    }
+
+    return render(request, 'AudioApp/home.html',context=context)
 
 
 
 def user_account(request):
-    return render(request, 'AudioApp/user.html')
+    """Представление для личного кабинета пользователя"""
+
+    if request.user.is_authenticated:
+        return redirect('user_page')
+    else:
+        return render(request, 'AudioApp/user.html')
+
+
 
 class RegisterUser(CreateView):
-    """Регистрация пользователя."""
+    """Представление для регистрации пользователя."""
     form_class = RegisterUserForm
     template_name = 'AudioApp/registration.html'
     success_url = reverse_lazy('user_page')
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        """Формирует динамический контекст"""
         context = super().get_context_data(**kwargs)
         context['title'] = 'Регистрация'
         return context
@@ -93,16 +94,15 @@ def about(request):
 def deletion_page(request):
     return render(request, 'AudioApp/deletion.html')
 
-# def login(request):
-#     return render(request, 'AudioApp/login.html')
+
 
 class Login(LoginView):
-    """Авторизация пользователя."""
+    """Представление для авторизации пользователя."""
     form_class= LoginUserForm
     template_name = 'AudioApp/login.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        """Добавление контекста в шаблон."""
+        """Формирует динамический контекст."""
         context = super().get_context_data(**kwargs)
         context['title'] = 'Авторизация'
 
@@ -114,16 +114,27 @@ class Login(LoginView):
 
 
 def logout_user(request):
+    """Осуществляет выход пользователя из своей учетной записи"""
     logout(request)
     return redirect('home')
 
+def userpage(request):
+
+    return render(request, 'AudioApp/userpage.html', )
 
 
-
-
-
-def user_page(request):
-    return render(request, 'AudioApp/userpage.html')
-
+# class UserPage(ListView):
+#     """Представление для страницы пользователя"""
+#
+#     model = AudioData
+#     template_name = 'AudioApp/userpage.html'
+#     context_object_name = 'userdata'
+#     allow_empty = False
+#
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['title']= "Привет"
+#
+#         return context
 
 

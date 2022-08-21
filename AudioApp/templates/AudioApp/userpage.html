@@ -2,10 +2,4 @@
 {% load static %}
 
 {% block content %}
-<div class="features">
-    <center><h2>Привет, {{user.username.title}}</h2></center>
-    <input type="button" class="btn btn-warning" value="Выйти" onclick='location.href="{% url "logout_user" %}"'>
-    <p></p>
-</div>
-
 {% endblock %}

@@ -3,10 +3,12 @@
 {% load static %}
 
 {% block content %}
-<div class="features">
+<div class="features" >
+
     <center><h1>Онлайн конвертер аудио</h1></center>
     <center><p>Сконвертируйте онлайн аудиофайлы любого формата, представленных ниже</p></center>
-    <center><p>Конвертируетмые форматы: {{select.show_formats}} </p></center>
+    <center><p>Конвертируетмые форматы: {{form.show_formats}} </p></center>
+
     <br>
     <form action="" method = "post" enctype="multipart/form-data">
         {% csrf_token %}
