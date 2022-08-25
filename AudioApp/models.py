@@ -25,11 +25,33 @@ class AudioData(models.Model):
         return str(self.login)
 
     def get_absolute_url(self):
-        """Возвращает url для объекта"""
-        return reverse('trek_name', kwargs={'trek_name': self.trek_name})
+        """Возвращает url пользователя"""
+        return reverse('user_page', kwargs={'slug': self.login})
 
     class Meta:
         """Настройки модели"""
         verbose_name = 'Трек пользователя'
         verbose_name_plural = 'Треки пользователя'
         ordering = ['date']
+
+    def get_convertable(self):
+        """Возвращет относительный путь к сконвертированному треку."""
+
+        # Для отображения путей к трекам в личном кабинете с тегом static
+        if self.convertable_track:
+            audio = str(self.convertable_track) # << AudioApp/static//convertible_tracks/____.___
+            path = audio[audio.rfind('convertible_tracks'):] # << convertible_tracks/_____.___
+
+            return path
+        else:
+            return None
+
+    def get_trek_name(self):
+        """Возвращает имя сконвертированного трека."""
+
+        if self.trek_name and self.convertable_format:
+            name :str = f"{str(self.trek_name)}.{str(self.convertable_format)}"
+            return name
+
+        else:
+            return None

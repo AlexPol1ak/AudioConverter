@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView
 
 from .forms import UploadFileForm, RegisterUserForm, LoginUserForm
+from .models import AudioData
 from .utils.database import write_database
 from .utils.converter import converter
 
@@ -62,7 +63,8 @@ def user_account(request):
     """Представление для личного кабинета пользователя"""
 
     if request.user.is_authenticated:
-        return redirect('user_page')
+        return redirect(reverse('user_page',kwargs={'slug':request.user.username}))
+        # return redirect('user_page')
     else:
         return render(request, 'AudioApp/user.html')
 
@@ -72,7 +74,9 @@ class RegisterUser(CreateView):
     """Представление для регистрации пользователя."""
     form_class = RegisterUserForm
     template_name = 'AudioApp/registration.html'
-    success_url = reverse_lazy('user_page')
+    success_url = reverse_lazy('user_account')
+    raise_exception = True
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """Формирует динамический контекст"""
@@ -84,7 +88,7 @@ class RegisterUser(CreateView):
         """Авторизовывает при успешной регистрации."""
         user = form.save()
         login(self.request, user)
-        return redirect('user_page')
+        return redirect('user_account')
 
 
 
@@ -100,6 +104,7 @@ class Login(LoginView):
     """Представление для авторизации пользователя."""
     form_class= LoginUserForm
     template_name = 'AudioApp/login.html'
+    raise_exception = True
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """Формирует динамический контекст."""
@@ -110,7 +115,7 @@ class Login(LoginView):
 
     def get_success_url(self):
         """Перенаправление пользователя на страницу профиля."""
-        return reverse('user_page')
+        return reverse('user_account')
 
 
 def logout_user(request):
@@ -118,23 +123,24 @@ def logout_user(request):
     logout(request)
     return redirect('home')
 
-def userpage(request):
-
-    return render(request, 'AudioApp/userpage.html', )
 
 
-# class UserPage(ListView):
-#     """Представление для страницы пользователя"""
-#
-#     model = AudioData
-#     template_name = 'AudioApp/userpage.html'
-#     context_object_name = 'userdata'
-#     allow_empty = False
-#
-#     def get_context_data(self, *, object_list=None, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['title']= "Привет"
-#
-#         return context
+class UserPage(ListView):
+    """Представление для страницы пользователя"""
+
+    model = AudioData
+    # paginate_by = 5
+    template_name = 'AudioApp/userpage.html'
+    context_object_name = 'userdata'
+    allow_empty = True
+
+    def get_queryset(self):
+        return AudioData.objects.filter(login=self.request.user.username)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title']= "Личный кабинет"
+
+        return context
 
 
