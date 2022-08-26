@@ -1,4 +1,5 @@
 from django.contrib.auth import login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render, reverse
 # from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
@@ -63,10 +64,10 @@ def user_account(request):
     """Представление для личного кабинета пользователя"""
 
     if request.user.is_authenticated:
-        return redirect(reverse('user_page',kwargs={'slug':request.user.username}))
-        # return redirect('user_page')
+        # return redirect(reverse('user_page',kwargs={'slug':request.user.username}))
+        return redirect('user_page')
     else:
-        return render(request, 'AudioApp/user.html')
+        return render(request, 'AudioApp/guest.html')
 
 
 
@@ -88,7 +89,7 @@ class RegisterUser(CreateView):
         """Авторизовывает при успешной регистрации."""
         user = form.save()
         login(self.request, user)
-        return redirect('user_account')
+        return redirect('user_page')
 
 
 
@@ -115,7 +116,7 @@ class Login(LoginView):
 
     def get_success_url(self):
         """Перенаправление пользователя на страницу профиля."""
-        return reverse('user_account')
+        return reverse('user_page')
 
 
 def logout_user(request):
@@ -125,7 +126,7 @@ def logout_user(request):
 
 
 
-class UserPage(ListView):
+class UserPage(LoginRequiredMixin, ListView):
     """Представление для страницы пользователя"""
 
     model = AudioData
@@ -142,5 +143,4 @@ class UserPage(ListView):
         context['title']= "Личный кабинет"
 
         return context
-
 
