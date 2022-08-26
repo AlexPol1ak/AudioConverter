@@ -8,7 +8,7 @@ urlpatterns = [
     path('registration', views.RegisterUser.as_view(), name='user_reg'), # Регистрация
     path('about/', views.about, name='about'), # О нас
     path('deletion/', views.deletion_page, name='deletion_page'), # Страница удаления аккаунта
-    path('<slug:slug>', views.UserPage.as_view(), name='user_page'), # Страница пользователя
+    path('userpage', views.UserPage.as_view(), name='user_page'), # Страница пользователя
     path('logout/', views.logout_user, name='logout_user'), # Выход из аккаунта
 ]
 
