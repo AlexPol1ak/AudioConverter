@@ -138,5 +138,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'AudioApp/media')
 
 MEDIA_URL = '/media/'
 
+LOGIN_URL = 'login'
+
 # def MEDIA_URL():
 #    return None
