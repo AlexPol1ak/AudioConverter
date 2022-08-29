@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
@@ -14,6 +15,7 @@ class UserSong(models.Model):
 class AudioData(models.Model):
     """База данных для хранения данных о треках"""
     login = models.CharField(max_length=100, verbose_name='Имя пользователя')
+    # slug = models.SlugField(max_length=100, db_index=True, verbose_name='URL')
     trek_name = models.CharField(max_length=100, verbose_name='Имя трека')
     original_format = models.CharField(max_length=100, verbose_name='Формат оригинала')
     original_track = models.CharField(max_length=100, verbose_name='Оригинальный трек')

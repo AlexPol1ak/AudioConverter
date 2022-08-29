@@ -1,10 +1,12 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render, reverse
 # from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, DeleteView, DetailView, UpdateView
+from rest_framework.generics import get_object_or_404
 
 from .forms import UploadFileForm, RegisterUserForm, LoginUserForm
 from .models import AudioData
@@ -64,8 +66,8 @@ def user_account(request):
     """Представление для личного кабинета пользователя"""
 
     if request.user.is_authenticated:
-        # return redirect(reverse('user_page',kwargs={'slug':request.user.username}))
-        return redirect('user_page')
+        return redirect(reverse('user_page',kwargs={'slug': request.user.username.lower()}))
+        # return redirect('user_page')
     else:
         return render(request, 'AudioApp/guest.html')
 
@@ -89,17 +91,12 @@ class RegisterUser(CreateView):
         """Авторизовывает при успешной регистрации."""
         user = form.save()
         login(self.request, user)
-        return redirect('user_page')
+        return redirect('user_account')
 
 
 
 def about(request):
     return render(request, 'AudioApp/about.html')
-
-def deletion_page(request):
-    return render(request, 'AudioApp/deletion.html')
-
-
 
 class Login(LoginView):
     """Представление для авторизации пользователя."""
@@ -116,7 +113,7 @@ class Login(LoginView):
 
     def get_success_url(self):
         """Перенаправление пользователя на страницу профиля."""
-        return reverse('user_page')
+        return reverse('user_account')
 
 
 def logout_user(request):
@@ -126,7 +123,7 @@ def logout_user(request):
 
 
 
-class UserPage(LoginRequiredMixin, ListView):
+class UserPage(LoginRequiredMixin, ListView,):
     """Представление для страницы пользователя"""
 
     model = AudioData
@@ -136,6 +133,7 @@ class UserPage(LoginRequiredMixin, ListView):
     allow_empty = True
 
     def get_queryset(self):
+        self.kwargs['slug'] = self.request.user.username
         return AudioData.objects.filter(login=self.request.user.username)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -143,4 +141,13 @@ class UserPage(LoginRequiredMixin, ListView):
         context['title']= "Личный кабинет"
 
         return context
+
+
+def user_settings(request):
+    return render(request, 'AudioApp/update.html')
+
+
+
+
+
 
