@@ -33,6 +33,7 @@
 <center
     <h4><font size="5" color="white"> Вы авторизованы как {{ request.user.username}} </font>
         <input type="button" class="btn btn-warning" value="Выйти" onclick='location.href="{% url "logout_user" %}"'>
+         <input type="button" class="btn btn-warning" value="Изменить пароль" onclick='location.href="{% url "password_change" %}"'>
     </h4>
 </center>
 

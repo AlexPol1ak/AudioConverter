@@ -1,7 +1,7 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
 from django.shortcuts import redirect, render, reverse
 # from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -147,7 +147,19 @@ def user_settings(request):
     return render(request, 'AudioApp/update.html')
 
 
+class PasswordChange(PasswordChangeView):
+    """Представление для изменения пароля."""
+    template_name = 'AudioApp/password_change.html'
+    success_url = reverse_lazy('password_change_ok')
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title']= "Изменение пароля"
 
+        return context
 
+class PasswordChangeOk(PasswordChangeDoneView):
+    """Предсталвение успешной смены пороля"""
 
+    template_name = 'AudioApp/password_change_ok.html'
+    title = 'Пароль изменен'
