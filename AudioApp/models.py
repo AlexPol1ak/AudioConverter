@@ -57,3 +57,12 @@ class AudioData(models.Model):
 
         else:
             return None
+
+    def get_trek_format(self):
+        """возвращает формат трека."""
+        if self.convertable_format:
+            frmt = str(self.convertable_format).lower()
+            return frmt
+
+        else:
+            return None
