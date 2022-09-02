@@ -1,0 +1,29 @@
+{% extends 'AudioApp/layout.html' %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div class="features">
+    <center><h2>{{title}}</h2></center>
+
+<center>
+<form method="POST">
+    {% csrf_token %}
+    {% for f in form %}
+    <p>
+        <label class='form-label' for="{{ f.id_for_label}}">{{f.label}}:</label>{{f}}
+    </p>
+    {% endfor %}
+
+    {% if error %}
+    <font  color="red" face="Arial">{{ error }} </font>
+    <br>
+    <br>
+    {% endif %}
+    <p><font  color="white" face="Arial">Отменить это действие будет невозможно! </font></p>
+    <button type="submit", class="btn btn-warning">Удалить мой аккаунт</button>
+</form>
+</center>
+</div>
+{% endblock %}
+

@@ -1,0 +1,15 @@
+{% extends 'AudioApp/layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="features">
+    <center><h3>{{message}}</h3>
+            <p>Ваш новый email:</p>
+            <p>{{email}}</p>
+            <input type="button" class="btn btn-warning" value="OK" onclick='location.href="{% url "user_account" %}"'>
+
+    </center>
+</div>
+{% endblock %}
+
