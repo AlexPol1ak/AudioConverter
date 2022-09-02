@@ -67,5 +67,24 @@ class LoginUserForm(AuthenticationForm):
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 
+class InputPasswordForm(forms.Form):
+    """Представление для ввода пароля при подтверждений действий."""
+
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+    def __init__(self, user= None, data=None):
+        self.user = user
+        super().__init__(data=data)
+
+    def clean_password(self):
+        """Проверка пароля"""
+
+        valid = self.user.check_password(self.cleaned_data['password'])
+        if not valid:
+            raise forms.ValidationError("Password Incorrect")
+        return valid
+
+
+
 
 
