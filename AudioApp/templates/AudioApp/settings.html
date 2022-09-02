@@ -1,7 +1,5 @@
 {% extends 'AudioApp/layout.html' %}
 
-{% block title %}Главная страница{% endblock %}
-
 {% block content %}
 <div class="features">
     <center><h3>{{title}}</h3>
@@ -9,7 +7,7 @@
         <p><a href="{% url 'password_change' %}">Изменить пароль</a></p>
         <p><a href="{% url 'email_change' %}">Изменить email</a></p>
         <br>
-        <p>Внимание! Это действие удалит ваши аудио и аккаунт, без возможности восстановления.</p>
+        <p>Внимание! Это действие удалит ваши аудио и аккаунт без возможности восстановления.</p>
         <p><a href="{% url 'del_page' %}">Удалить аккаунт</a></p>
 
     </center>

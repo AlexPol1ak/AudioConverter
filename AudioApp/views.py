@@ -47,7 +47,7 @@ def home_page(request):
             trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
             flag: bool = write_database(trek_dict)
         except:
-            pass
+            return render(request, 'AudioApp/conversion_error.html')
 
         # Информация о конвертированном файле для контекста
         trek_name: str = trek_dict['trek_name']
@@ -100,7 +100,7 @@ class RegisterUser(CreateView):
 
 
 def about(request):
-    return render(request, 'AudioApp/about.html')
+    return render(request, 'AudioApp/about.html',context={'title': 'О нас'})
 
 class Login(LoginView):
     """Представление для авторизации пользователя."""

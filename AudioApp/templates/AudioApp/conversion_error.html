@@ -1,0 +1,19 @@
+{% extends 'AudioApp/layout.html' %}
+
+{% block title %}Упс{% endblock %}
+
+{% block content %}
+<div class="features">
+    <center><h3>Ошибка :(</h3>
+        <br>
+        <p>Ой, что-то пошло не так. Нам не удалось преобразовать Ваш аудиофайл.<br>
+            Возможно аудиофайл поврежден или имеет неподдерживаемый формат.<br>
+            Попробуйте еще раз.
+        </p>
+        <p><input type="button" class="btn btn-warning" value="Попробовать снова" onclick='location.href="{% url "home" %}"'></p>
+
+
+    </center>
+</div>
+{% endblock %}
+
