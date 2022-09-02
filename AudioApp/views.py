@@ -1,14 +1,16 @@
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView
+from django.http import HttpResponse
 from django.shortcuts import redirect, render, reverse
 # from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DeleteView, DetailView, UpdateView
 from rest_framework.generics import get_object_or_404
 
-from .forms import UploadFileForm, RegisterUserForm, LoginUserForm
+from .forms import UploadFileForm, RegisterUserForm, LoginUserForm, InputPasswordForm
 from .models import AudioData
 from .utils.database import write_database
 from .utils.converter import converter
@@ -41,9 +43,11 @@ def home_page(request):
         frmt :str = request.POST.get('format')
 
         # Конвертирование аудиофайла и сохранение информации о нем в базу данных
-
-        trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
-        flag: bool = write_database(trek_dict)
+        try:
+            trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
+            flag: bool = write_database(trek_dict)
+        except:
+            pass
 
         # Информация о конвертированном файле для контекста
         trek_name: str = trek_dict['trek_name']
@@ -144,7 +148,10 @@ class UserPage(LoginRequiredMixin, ListView,):
 
 
 def user_settings(request):
-    return render(request, 'AudioApp/update.html')
+    context = {'title': 'Настройки',}
+    return render(request, 'AudioApp/settings.html', context=context)
+
+
 
 
 class PasswordChange(PasswordChangeView):
@@ -163,3 +170,61 @@ class PasswordChangeOk(PasswordChangeDoneView):
 
     template_name = 'AudioApp/password_change_ok.html'
     title = 'Пароль изменен'
+
+class EmailChange(UpdateView):
+    model = User
+    fields = ['email']
+    template_name = 'AudioApp/email_change.html'
+    # success_url = reverse_lazy('user_account')
+
+    def get_queryset(self):
+        print(EmailChange.__dir__(self))
+        self.kwargs['pk'] = self.request.user.id
+        return User.objects.filter(pk=self.request.user.id)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'title': 'Сменить пороль',})
+
+        return context
+
+    def form_valid(self, form):
+        """Авторизовывает при успешной регистрации."""
+        user = form.save()
+        return redirect('email_change_ok')
+
+@login_required
+def del_page(request):
+    """Представление для удаления деактивации аккаутна."""
+
+    context = {'title': 'Удаление аккаунта'}
+
+    if request.method !='POST':
+        form = InputPasswordForm()
+        context.update({'form': form})
+
+    else:
+        form = InputPasswordForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            # Деактивировать аккаунт и разлогинить пользвателя
+            request.user.is_active = False
+            request.user.save()
+            return logout_user(request)
+
+        else:
+            form = InputPasswordForm()
+            context.update({'form': form, 'error': 'Неверный пароль !'})
+
+
+    return render(request, 'AudioApp/del_page.html', context)
+
+@login_required
+def email_change_done(request):
+    """Передстовление для отображения успешной смены email."""
+
+    context = {
+        'title': 'Изменить email',
+        'message': 'Email изменен!',
+        'email': request.user.email
+    }
+    return render(request,'AudioApp/email_change_ok.html', context)
