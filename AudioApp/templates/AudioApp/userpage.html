@@ -6,15 +6,26 @@
 <div class="features">
 <center>
     <h3>Ваши файлы: </h3><br>
-    {% if userdata.0.get_convertable %}
-        {% for u in userdata %}
-            <p><a href="{% static u.get_convertable %}" download>{{ forloop.counter}}.{{u.get_trek_name}}</a></p>
-
-        {% endfor %}
-
+    {% if userdata.0 == 'error404' %}
+        <meta http-equiv="refresh" content="0;{% url 'error404' %}">
     {% else %}
+        {% if userdata.0.get_convertable %}
+            {% for u in userdata %}
+                <p><a href="{% static u.get_convertable %}" download>{{ forloop.counter}}.{{u.get_trek_name}}</a></p>
 
-    <p>У Вас нет аудиофайлов.</p>
+            {% endfor %}
+        <nav>
+            <ul>
+                {% for p in paginator.page_range %}
+                    <li>
+                        <a href="?page{{ p }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        {% else %}
+            <p>У Вас нет аудиофайлов.</p>
+        {% endif %}
     {% endif %}
 </center>
 </div>
