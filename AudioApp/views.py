@@ -3,9 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseNotFound
 from django.shortcuts import redirect, render, reverse
-# from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DeleteView, DetailView, UpdateView
 from rest_framework.generics import get_object_or_404
@@ -47,6 +46,7 @@ def home_page(request):
             trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
             flag: bool = write_database(trek_dict)
         except:
+            # Открыть страницу при ошибке конвертирования
             return render(request, 'AudioApp/conversion_error.html')
 
         # Информация о конвертированном файле для контекста
@@ -65,45 +65,42 @@ def home_page(request):
     return render(request, 'AudioApp/home.html',context=context)
 
 
-
 def user_account(request):
     """Представление для личного кабинета пользователя"""
 
     if request.user.is_authenticated:
-        return redirect(reverse('user_page',kwargs={'slug': request.user.username.lower()}))
-        # return redirect('user_page')
+        return redirect(reverse('user_page', kwargs={'slug': request.user.username}))
     else:
         return render(request, 'AudioApp/guest.html')
 
 
-
 class RegisterUser(CreateView):
     """Представление для регистрации пользователя."""
+
     form_class = RegisterUserForm
     template_name = 'AudioApp/registration.html'
     success_url = reverse_lazy('user_account')
     raise_exception = True
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
-        """Формирует динамический контекст"""
+        """Формирует динамический контекст."""
+
         context = super().get_context_data(**kwargs)
         context['title'] = 'Регистрация'
+
         return context
 
     def form_valid(self, form):
         """Авторизовывает при успешной регистрации."""
         user = form.save()
         login(self.request, user)
+
         return redirect('user_account')
 
 
-
-def about(request):
-    return render(request, 'AudioApp/about.html',context={'title': 'О нас'})
-
 class Login(LoginView):
     """Представление для авторизации пользователя."""
+
     form_class= LoginUserForm
     template_name = 'AudioApp/login.html'
     raise_exception = True
@@ -122,80 +119,118 @@ class Login(LoginView):
 
 def logout_user(request):
     """Осуществляет выход пользователя из своей учетной записи"""
+
     logout(request)
     return redirect('home')
-
 
 
 class UserPage(LoginRequiredMixin, ListView,):
     """Представление для страницы пользователя"""
 
     model = AudioData
-    # paginate_by = 5
+    paginate_by = 5
     template_name = 'AudioApp/userpage.html'
     context_object_name = 'userdata'
     allow_empty = True
 
     def get_queryset(self):
-        self.kwargs['slug'] = self.request.user.username
-        return AudioData.objects.filter(login=self.request.user.username)
+        # Url пользователя формируется по его логину. Проверяем совпадение url пользователя с его логином.
+        # Возвращаем список аудио пользователя если он авторизован, url совпадет с логином
+        if self.check_url():
+            return AudioData.objects.filter(login=self.kwargs['slug'])
+        else:
+            return ['error404']
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        """Формирует контекст"""
+
         context = super().get_context_data(**kwargs)
         context['title']= "Личный кабинет"
 
         return context
 
+    def check_url(self):
+        """Проверяет наличие совпадение слага с адресом веб-страницы, именем пользвателя."""
 
+        # Провеярет подмену url пользвателя в адресе веб-страницы
+        if self.kwargs['slug'] == self.request.user.username:
+            return True
+        else:
+            return False
+
+
+@login_required
 def user_settings(request):
+    """Представление для страницы настроек."""
+
     context = {'title': 'Настройки',}
     return render(request, 'AudioApp/settings.html', context=context)
 
 
-
-
 class PasswordChange(PasswordChangeView):
     """Представление для изменения пароля."""
+
     template_name = 'AudioApp/password_change.html'
     success_url = reverse_lazy('password_change_ok')
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        """Формирует контекст."""
         context = super().get_context_data(**kwargs)
         context['title']= "Изменение пароля"
 
         return context
 
+
 class PasswordChangeOk(PasswordChangeDoneView):
-    """Предсталвение успешной смены пороля"""
+    """Предсталвение для отображения успешного изменения пароля"""
 
     template_name = 'AudioApp/password_change_ok.html'
     title = 'Пароль изменен'
 
+
 class EmailChange(UpdateView):
+    """Представление для изменения email."""
+
     model = User
     fields = ['email']
     template_name = 'AudioApp/email_change.html'
     # success_url = reverse_lazy('user_account')
 
     def get_queryset(self):
-        print(EmailChange.__dir__(self))
+        """Выбор нужного пользователя."""
+
         self.kwargs['pk'] = self.request.user.id
+
         return User.objects.filter(pk=self.request.user.id)
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        """Формирует контекст."""
         context = super().get_context_data(**kwargs)
-        context.update({'title': 'Сменить пороль',})
+        context.update({'title': 'Изменить email',})
 
         return context
 
     def form_valid(self, form):
-        """Авторизовывает при успешной регистрации."""
+        """Сохранения пароля."""
+
         user = form.save()
         return redirect('email_change_ok')
 
+
+@login_required
+def email_change_done(request):
+    """Передстовление для отображения успешного изменения email."""
+
+    context = {
+        'title': 'Изменить email',
+        'message': 'Email изменен!',
+        'email': request.user.email
+    }
+    return render(request,'AudioApp/email_change_ok.html', context)
+
 @login_required
 def del_page(request):
-    """Представление для удаления деактивации аккаутна."""
+    """Представление для удаления (деактивации) аккаутна."""
 
     context = {'title': 'Удаление аккаунта'}
 
@@ -218,13 +253,15 @@ def del_page(request):
 
     return render(request, 'AudioApp/del_page.html', context)
 
-@login_required
-def email_change_done(request):
-    """Передстовление для отображения успешной смены email."""
+def about(request):
+    """Представление для страницы 'О нас'."""
+    return render(request, 'AudioApp/about.html',context={'title': 'О нас'})
 
+
+def error404(request):
+    """Представление для несуществующих страниц.  """
     context = {
-        'title': 'Изменить email',
-        'message': 'Email изменен!',
-        'email': request.user.email
+        'message' : 'Упс, ошибка',
+        'title': 'Ошибка 404'
     }
-    return render(request,'AudioApp/email_change_ok.html', context)
+    return render(request, 'AudioApp/error404.html', context)
