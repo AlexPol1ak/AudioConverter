@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block content %}
+{% if request.user.is_authenticated %}
+    <meta http-equiv="refresh" content="0;{% url 'user_account' %}">
+{% else %}
 <title>{{title}}</title>
 
 <div class="features">
@@ -19,4 +22,5 @@
     <center><button type="submit", class="btn btn-warning">Войти</button></center>
 </form>
 </div>
+{% endif %}
 {% endblock %}
