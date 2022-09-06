@@ -16,7 +16,8 @@ urlpatterns = [
     path('password-change/done/', views.PasswordChangeOk.as_view(), name='password_change_ok'),  # Страница успешного изм пароля
     path('email-change/', views.EmailChange.as_view(), name='email_change'), #  Страница изменения email
     path('email-change/done/', views.email_change_done, name='email_change_ok'),
-    path('delete-page/', views.del_page, name='del_page')
+    path('delete-page/', views.del_page, name='del_page'),
+    path('page-not-found/', views.error404, name='error404')
 
 ]
 
