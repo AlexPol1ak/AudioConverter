@@ -6,6 +6,7 @@ from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordCha
 from django.http import HttpResponse, Http404, HttpResponseNotFound
 from django.shortcuts import redirect, render, reverse
 from django.urls import reverse_lazy
+from django.utils.decorators import classonlymethod
 from django.views.generic import CreateView, ListView, DeleteView, DetailView, UpdateView
 from rest_framework.generics import get_object_or_404
 
@@ -137,7 +138,8 @@ class UserPage(LoginRequiredMixin, ListView,):
         # Url пользователя формируется по его логину. Проверяем совпадение url пользователя с его логином.
         # Возвращаем список аудио пользователя если он авторизован, url совпадет с логином
         if self.check_url():
-            return AudioData.objects.filter(login=self.kwargs['slug'])
+            lst = AudioData.objects.filter(login=self.kwargs['slug'])
+            return lst
         else:
             return ['error404']
 
@@ -157,6 +159,12 @@ class UserPage(LoginRequiredMixin, ListView,):
             return True
         else:
             return False
+
+    def paginator_objects_count(self):
+        pass
+
+
+
 
 
 @login_required
@@ -262,6 +270,6 @@ def error404(request):
     """Представление для несуществующих страниц.  """
     context = {
         'message' : 'Упс, ошибка',
-        'title': 'Ошибка 404'
+        'title': 'Ошибка 404',
     }
     return render(request, 'AudioApp/error404.html', context)
