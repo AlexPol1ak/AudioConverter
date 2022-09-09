@@ -8,25 +8,46 @@
     <h3>Ваши файлы: </h3><br>
     {% if userdata.0 == 'error404' %}
         <meta http-equiv="refresh" content="0;{% url 'error404' %}">
-
     {% else %}
-        {% if userdata.0.get_convertable %}
-            {% for u in userdata %}
-                <p><a href="{% static u.get_convertable %}" download>{{ forloop.counter}}.{{u.get_trek_name}}</a></p>
 
+        {% if userdata.0.get_convertable %}
+
+            {% for u in page_obj.object_list %}
+                <p><a href="{% static u.get_convertable %}" download><em>{{ forloop.counter}}.{{u.get_trek_name}}</em></a></p>
             {% endfor %}
-        <nav>
-            <ul>
-                {% for p in paginator.page_range %}
-                    <li>
-                        <a href="?page{{ p }}">{{ p }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </nav>
+
+                {% if page_obj.has_other_pages %}
+                    <div class="">
+
+
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"><i> <<Предыдущая страница &nbsp &nbsp</i></a>
+                    {% else %}
+                        <i>Предыдущая страница &nbsp &nbsp</i>
+                    {% endif %}
+
+                    {% for p in paginator.page_range %}
+		                {% if page_obj.number == p %}
+                            {{p}}
+                        {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+                            <a href="?page={{p}}"><i>{{ p }}</i></a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"><i>&nbsp &nbsp >>Следующая страница</i></a>
+                    {% else %}
+                        <a><i>&nbsp &nbsp >>Следующая страница</i></a>
+                    {% endif %}
+                    </div>
+                {% endif %}
+
+
+
         {% else %}
             <p>У Вас нет аудиофайлов.</p>
         {% endif %}
+
     {% endif %}
 </center>
 </div>
