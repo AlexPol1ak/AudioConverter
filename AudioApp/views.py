@@ -130,6 +130,7 @@ class UserPage(LoginRequiredMixin, ListView,):
 
     model = AudioData
     paginate_by = 5
+    paginate_orphans = 2
     template_name = 'AudioApp/userpage.html'
     context_object_name = 'userdata'
     allow_empty = True
@@ -138,8 +139,7 @@ class UserPage(LoginRequiredMixin, ListView,):
         # Url пользователя формируется по его логину. Проверяем совпадение url пользователя с его логином.
         # Возвращаем список аудио пользователя если он авторизован, url совпадет с логином
         if self.check_url():
-            lst = AudioData.objects.filter(login=self.kwargs['slug'])
-            return lst
+            return AudioData.objects.filter(login=self.kwargs['slug'])
         else:
             return ['error404']
 
