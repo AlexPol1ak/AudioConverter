@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
+from captcha.fields import CaptchaField
+
 from AudioApp.models import UserSong
 from .audiohandler.audio import AudioConverter
 
@@ -17,10 +19,13 @@ class UploadFileForm(forms.ModelForm, forms.Form):
 
     format: forms.Form = forms.ChoiceField(choices=formats_tuple)
 
+    captcha = CaptchaField()
+
     def clean_audio_file(self):
         """Проверка файла"""
 
         file = self.cleaned_data.get('audio_file', False)
+
         if file:
             if file.size > 10 * 1024 * 1024:
                 raise ValidationError("Audio file too large ( > 10mb )")

@@ -6,6 +6,7 @@ from AudioConverter import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('captcha', include('captcha.urls')),
     path('', include('AudioApp.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)  # Загрузка файлов на локальном сервере
 
