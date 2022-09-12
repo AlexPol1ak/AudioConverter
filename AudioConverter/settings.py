@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'AudioApp.apps.AudioappConfig',
-    'captcha'
+    'captcha',
+    'debug_toolbar',
 
 
 ]
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'AudioConverter.urls'
@@ -140,6 +142,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'AudioApp/media')
 MEDIA_URL = '/media/'
 
 LOGIN_URL = 'login'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # def MEDIA_URL():
 #    return None
