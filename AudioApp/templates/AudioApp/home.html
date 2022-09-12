@@ -14,19 +14,24 @@
     <form action="" method = "post" enctype="multipart/form-data">
         {% csrf_token %}
         <center>
+
             {{ form.as_p }}
+
+            {% if errors %}
+            {% for error in errors.values %}
+                <i><font color="red">{{error}}</font></i>
+                <br>
+            {% endfor %}
+            {% endif %}
+
             <h6 title="Выберите формат конвертирования">{{select}}</h6>
-            <br>
             {{conv_song}}
-            <button type='submit' name='upload' class="btn btn-warning">Загрузить файл</button><br>
+            <button type='submit' name='upload' class="btn btn-warning">Загрузить файл</button>
         </center>
-
-
     </form>
 </div>
 
 <div class="features">
-
     <center>
     {% if trek_name %}
         <p>Click on the link to download file: {{ trek_name }}.{{ format }}</p>

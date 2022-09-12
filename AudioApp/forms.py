@@ -27,15 +27,15 @@ class UploadFileForm(forms.ModelForm, forms.Form):
         file = self.cleaned_data.get('audio_file', False)
 
         if file:
-            if file.size > 10 * 1024 * 1024:
-                raise ValidationError("Audio file too large ( > 10mb )")
+            if file.size > 50 * 1024 * 1024:
+                raise ValidationError("Аудиофайл слишком большой ( > 50mb )")
 
             if not os.path.splitext(file.name)[1] in ['.'+i for i in UploadFileForm.converter_formats]:
-                raise ValidationError("Doesn't have proper extension")
+                raise ValidationError("Недопустимое расширение.")
 
             return file
         else:
-            raise ValidationError("Couldn't read uploaded file")
+            raise ValidationError("Не удалось прочитать загруженный файл.")
 
     class Meta:
         model = UserSong

@@ -14,7 +14,7 @@ from .forms import UploadFileForm, RegisterUserForm, LoginUserForm, InputPasswor
 from .models import AudioData
 from .utils.database import write_database
 from .utils.converter import converter
-
+from .utils.utils import error_messages
 
 
 def home_page(request):
@@ -33,35 +33,41 @@ def home_page(request):
         else:
             login = 'Guest'
             name = None
+
         # Получаем данные из формы
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
 
-        # Получаем имя файла и выбраный пользвателем формат конвертации
-        text :str = str(form.files['audio_file']).replace(' ', '_')
-        frmt :str = request.POST.get('format')
+            # Получаем имя файла и выбраный пользвателем формат конвертации
+            text :str = str(form.files['audio_file']).replace(' ', '_')
+            frmt :str = request.POST.get('format')
 
-        # Конвертирование аудиофайла и сохранение информации о нем в базу данных
-        try:
-            trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
-            flag: bool = write_database(trek_dict)
-        except:
-            # Открыть страницу при ошибке конвертирования
-            return render(request, 'AudioApp/conversion_error.html')
+            # Конвертирование аудиофайла и сохранение информации о нем в базу данных
+            try:
+                trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
+                flag: bool = write_database(trek_dict)
+            except:
+                # Открыть страницу при ошибке конвертирования
+                return render(request, 'AudioApp/conversion_error.html')
 
-        # Информация о конвертированном файле для контекста
-        trek_name: str = trek_dict['trek_name']
-        trek_format: str = trek_dict['format']
-        audio: str = trek_dict['path_convert'].replace('AudioApp/static/', '')
+            # Информация о конвертированном файле для контекста
+            trek_name: str = trek_dict['trek_name']
+            trek_format: str = trek_dict['format']
+            audio: str = trek_dict['path_convert'].replace('AudioApp/static/', '')
 
-        # формируем контекст для представления
-        context = {'form': form, # форма загрузки файла
-                    'trek_name': trek_name, # имя сконвертированного файла
-                    'format': trek_format, # формат сконвертированного файла
-                    'audio': audio, # путь к сконвертированному файлу
-                    'name': name # имя пользователя
-                    }
+            # формируем контекст для представления
+            context = {'form': form, # форма загрузки файла
+                        'trek_name': trek_name, # имя сконвертированного файла
+                        'format': trek_format, # формат сконвертированного файла
+                        'audio': audio, # путь к сконвертированному файлу
+                        'name': name # имя пользователя
+                      }
+        else:
+            # получить ошибки в случае невалидных данных.
+            errors = error_messages(form)
+            context = {'form':UploadFileForm(),
+                       'errors': errors}
 
     return render(request, 'AudioApp/home.html',context=context)
 
@@ -138,7 +144,7 @@ class UserPage(LoginRequiredMixin, ListView,):
     def get_queryset(self):
         # Url пользователя формируется по его логину. Проверяем совпадение url пользователя с его логином.
         # Возвращаем список аудио пользователя если он авторизован, url совпадет с логином
-        if self.check_url():
+        if self.check_url() == True:
             return AudioData.objects.filter(login=self.kwargs['slug'])
         else:
             return ['error404']
@@ -162,9 +168,6 @@ class UserPage(LoginRequiredMixin, ListView,):
 
     def paginator_objects_count(self):
         pass
-
-
-
 
 
 @login_required

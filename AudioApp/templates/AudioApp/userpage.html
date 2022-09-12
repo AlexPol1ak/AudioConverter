@@ -10,7 +10,7 @@
         <meta http-equiv="refresh" content="0;{% url 'error404' %}">
     {% else %}
 
-        {% if userdata.0.get_convertable %}
+        {% if userdata|length > 0 %}
 
             {% for u in page_obj.object_list %}
                 <p><a href="{% static u.get_convertable %}" download><em>{{ forloop.counter}}.{{u.get_trek_name}}</em></a></p>
