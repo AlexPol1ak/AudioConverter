@@ -11,7 +11,7 @@
     <center><h2>{{title}}</h2></center>
 <form method="POST">
     {% csrf_token %}
-     <div class="form-error">{{ form.non_field_errors }} </div>
+     <div class="form-error"><center>{{ form.non_field_errors }} </center></div>
     {% for f in form %}
     <p>
         <label class='form-label' for="{{ f.id_for_label}}">{{f.label}}:</label>{{f}}
