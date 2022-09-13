@@ -17,7 +17,10 @@ urlpatterns = [
     path('email-change/', views.EmailChange.as_view(), name='email_change'), #  Страница изменения email
     path('email-change/done/', views.email_change_done, name='email_change_ok'),
     path('delete-page/', views.del_page, name='del_page'),
-    path('page-not-found/', views.error404, name='error404')
+    path('page-not-found/', views.error404, name='error404'),
+    path('footer/', views.footer, name='footer')
 
 ]
+
+
 
