@@ -10,6 +10,9 @@ urlpatterns = [
     path('', include('AudioApp.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)  # Загрузка файлов на локальном сервере
 
+
+handler404 = "AudioApp.views.error404"
+
 # Загрузка медиа файлов на локальном сервере .
 if settings.DEBUG:
     import debug_toolbar
@@ -17,3 +20,5 @@ if settings.DEBUG:
         path('__debug__/', include('debug_toolbar.urls')),
     ] + urlpatterns
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
