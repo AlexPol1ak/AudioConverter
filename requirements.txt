@@ -3,8 +3,11 @@ audiodb==1.0.0
 certifi==2021.10.8
 charset-normalizer==2.0.12
 Django==4.0.5
+django-debug-toolbar==3.6.0
 django-extensions==3.2.0
+django-ranged-response==0.2.0
 django-shell-plus==1.1.7
+django-simple-captcha==0.5.17
 djangorestframework==3.13.1
 idna==3.3
 mysqlclient==2.1.0
