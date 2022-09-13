@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(&#+8vw_ums8=qjv*d@#1*8ul!f@ijw1!xx$)(%ayc8(q3r^b@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -146,6 +146,7 @@ LOGIN_URL = 'login'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
 
 # def MEDIA_URL():
 #    return None
