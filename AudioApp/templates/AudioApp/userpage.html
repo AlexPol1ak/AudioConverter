@@ -13,7 +13,22 @@
         {% if userdata|length > 0 %}
 
             {% for u in page_obj.object_list %}
-                <p><a href="{% static u.get_convertable %}" download><em>{{ forloop.counter}}.{{u.get_trek_name}}</em></a></p>
+                <details>
+                    <summary><em>{{ forloop.counter}}.{{u.get_trek_name}}</em></summary>
+                    <a href="{% static u.get_convertable %}" download>
+                        <em>
+                            {{u.get_trek_name}}.{{u.get_trek_format_convert}}
+                        </em>
+                    </a>&nbsp &nbsp -конвертирован
+                    <br>
+                    <a href="{% static u.get_original %}" download>
+                        <em>
+                            {{u.get_trek_name}}.{{u.get_trek_format_orig}}
+                        </em>
+                    </a>&nbsp &nbsp -оригинал
+                </details>
+                <br>
+
             {% endfor %}
 
                 {% if page_obj.has_other_pages %}
