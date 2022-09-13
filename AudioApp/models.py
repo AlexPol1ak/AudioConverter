@@ -52,17 +52,40 @@ class AudioData(models.Model):
     def get_trek_name(self):
         """Возвращает имя сконвертированного трека."""
 
-        if self.trek_name and self.convertable_format:
-            name :str = f"{str(self.trek_name)}.{str(self.convertable_format)}"
+        if self.trek_name:
+            name :str = str(self.trek_name)
             return name
 
         else:
             return None
 
-    def get_trek_format(self):
+    def get_trek_format_convert(self):
         """Возвращает формат трека."""
         if self.convertable_format:
             frmt = str(self.convertable_format).lower()
+            return frmt
+        else:
+            return None
+
+    def get_original(self):
+        """Возвращет относительный путь к оригинальному треку треку."""
+
+        # Для отображения путей к трекам в личном кабинете с тегом static
+        if self.original_track:
+            audio = str(self.original_track)  # << AudioApp/static//convertible_tracks/____.___
+            path = audio[audio.rfind('original_track'):]  # << convertible_tracks/_____.___
+            print(path)
+
+            return path
+        else:
+            return None
+
+
+    def get_trek_format_orig(self):
+        """Возвращает формат трека."""
+
+        if self.original_format:
+            frmt = str(self.original_format).lower()
             return frmt
         else:
             return None
