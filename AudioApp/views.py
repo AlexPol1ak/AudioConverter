@@ -3,12 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView
-from django.http import HttpResponse, Http404, HttpResponseNotFound
 from django.shortcuts import redirect, render, reverse
 from django.urls import reverse_lazy
 from django.utils.decorators import classonlymethod
-from django.views.generic import CreateView, ListView, DeleteView, DetailView, UpdateView
-from rest_framework.generics import get_object_or_404
+from django.views.decorators.cache import cache_page
+from django.views.generic import CreateView, ListView, UpdateView
 
 from .forms import UploadFileForm, RegisterUserForm, LoginUserForm, InputPasswordForm
 from .models import AudioData
@@ -264,11 +263,14 @@ def del_page(request):
 
     return render(request, 'AudioApp/del_page.html', context)
 
+
+@cache_page(60 * 60 * 24)
 def about(request):
     """Представление для страницы 'О нас'."""
     return render(request, 'AudioApp/about.html',context={'title': 'О нас'})
 
 
+@cache_page(60 * 60 * 24)
 def error404(request,exception=''):
     """Представление для несуществующих страниц.  """
     context = {
@@ -278,6 +280,7 @@ def error404(request,exception=''):
     return render(request, 'AudioApp/error404.html', context, status=404)
 
 
+@cache_page(60 * 60 * 24)
 def footer(request):
     """Представление для footer."""
 

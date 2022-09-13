@@ -1,8 +1,11 @@
 {% extends 'AudioApp/layout.html' %}
+{% load cache %}
 
 {% block title %}Упс{% endblock %}
 
 {% block content %}
+{% cache 6000 conversion_error %}
+
 <div class="features">
     <center><h3>Ошибка :(</h3>
         <br>
@@ -15,5 +18,7 @@
 
     </center>
 </div>
+
+{% endcache %}
 {% endblock %}
 
