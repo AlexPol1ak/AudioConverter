@@ -269,10 +269,17 @@ def about(request):
     return render(request, 'AudioApp/about.html',context={'title': 'О нас'})
 
 
-def error404(request):
+def error404(request,exception=''):
     """Представление для несуществующих страниц.  """
     context = {
         'message' : 'Упс, ошибка',
         'title': 'Ошибка 404',
     }
-    return render(request, 'AudioApp/error404.html', context)
+    return render(request, 'AudioApp/error404.html', context, status=404)
+
+
+def footer(request):
+    """Представление для footer."""
+
+    context = {'title': 'Cправочная информация'}
+    return render(request, 'AudioApp/footer.html', context)
