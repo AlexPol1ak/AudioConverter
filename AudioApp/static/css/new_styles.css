@@ -7,7 +7,7 @@ aside {
     background: #181818;
     width: 15%;
     padding: 2.5%;
-    height: 140vh;
+    height: 130vh;
     color: #fff;
     border-right: 5px solid #4d4d4d;
 }
@@ -71,3 +71,12 @@ main .features p {max-width: 700px; margin: 20px auto}
 }
 
 
+#footer {
+   position:fixed;
+   left:10px;
+   bottom:0px;
+   height:30px;
+   width:100%;
+   color: #CC0000;
+
+}
