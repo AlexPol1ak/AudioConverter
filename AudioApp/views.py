@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -53,7 +55,7 @@ def home_page(request):
             # Информация о конвертированном файле для контекста
             trek_name: str = trek_dict['trek_name']
             trek_format: str = trek_dict['format']
-            audio: str = trek_dict['path_convert'].replace('AudioApp/static/', '')
+            audio: str = trek_dict['path_convert'].replace(os.path.join('AudioApp', 'static'), '')
 
             # формируем контекст для представления
             context = {'form': form, # форма загрузки файла
