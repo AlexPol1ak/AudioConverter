@@ -55,7 +55,8 @@ def home_page(request):
             # Информация о конвертированном файле для контекста
             trek_name: str = trek_dict['trek_name']
             trek_format: str = trek_dict['format']
-            audio: str = trek_dict['path_convert'].replace(os.path.join('AudioApp', 'static'), '')
+            # audio: str = trek_dict['path_convert']
+            audio :str = os.path.relpath(trek_dict['path_convert'], 'AudioApp\static')
 
             # формируем контекст для представления
             context = {'form': form, # форма загрузки файла
@@ -64,6 +65,7 @@ def home_page(request):
                         'audio': audio, # путь к сконвертированному файлу
                         'name': name # имя пользователя
                       }
+
         else:
             # получить ошибки в случае невалидных данных.
             errors = error_messages(form)
