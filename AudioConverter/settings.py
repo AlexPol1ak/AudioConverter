@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-(&#+8vw_ums8=qjv*d@#1*8ul!f@ijw1!xx$)(%ayc8(q3r^b@
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
+# ALLOWED_HOSTS = ['zarjrw4z.beget.tech', 'www.zarjrw4z.beget.tech', ]
 
 
 # Application definition
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -83,6 +85,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'zarjrw4z_django',
+        # 'USER': 'zarjrw4z_django',
+        # 'PASSWORD': 'c2d&eT0o',
+        # 'HOST': 'localhost',
+        # 'PORT': '3306',
     }
 }
 
@@ -122,22 +130,15 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 
-# STATIC_URL = 'static/'
-# STATICFILES_DIRS = [
-#     'AudioApp/static'
-# ]
-
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
     (os.path.join(BASE_DIR, "AudioApp/static")),
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'AudioApp/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
 
@@ -146,6 +147,11 @@ LOGIN_URL = 'login'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CACHES = {'default': {'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
                           'LOCATION': os.path.join(BASE_DIR, 'AudioApp_cache')}

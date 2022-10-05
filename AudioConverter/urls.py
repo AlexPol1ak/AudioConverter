@@ -8,8 +8,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('captcha', include('captcha.urls')),
     path('', include('AudioApp.urls'))
-] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)  # Загрузка файлов на локальном сервере
-
+]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)  # Загрузка файлов на локальном сервере
 
 handler404 = "AudioApp.views.error404"
 
@@ -19,6 +20,6 @@ if settings.DEBUG:
     urlpatterns = [
         path('__debug__/', include('debug_toolbar.urls')),
     ] + urlpatterns
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 
