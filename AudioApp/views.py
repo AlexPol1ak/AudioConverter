@@ -41,36 +41,39 @@ def home_page(request):
             form.save()
 
             # Получаем имя файла и выбраный пользвателем формат конвертации
-            text :str = str(form.files['audio_file']).replace(' ', '_')
+            audio_orig :str = str(form.files['audio_file']).replace(' ', '_')
             frmt :str = request.POST.get('format')
+            audio_original_path = os.path.join(converter.storage_path, 'audio_files', audio_orig)
 
             # Конвертирование аудиофайла и сохранение информации о нем в базу данных
             try:
-                trek_dict: dict = converter.convert(f'AudioApp/media/audio_files/{text}', frmt=frmt, name=login)
+                trek_dict: dict = converter.convert(audio_original_path, frmt=frmt, name=login)
                 flag: bool = write_database(trek_dict)
             except:
                 # Открыть страницу при ошибке конвертирования
-                return render(request, 'AudioApp/conversion_error.html')
+                return render(request, 'AudioApp/conversion_error.html', {'title': 'Ошибка:('})
 
             # Информация о конвертированном файле для контекста
             trek_name: str = trek_dict['trek_name']
             trek_format: str = trek_dict['format']
-            # audio: str = trek_dict['path_convert']
-            audio :str = os.path.relpath(trek_dict['path_convert'], 'AudioApp\static')
+            audio_convert = trek_dict['path_convert']
+            # audio_convert :str = os.path.relpath(trek_dict['path_convert'], 'AudioApp\static')
 
             # формируем контекст для представления
             context = {'form': form, # форма загрузки файла
                         'trek_name': trek_name, # имя сконвертированного файла
                         'format': trek_format, # формат сконвертированного файла
-                        'audio': audio, # путь к сконвертированному файлу
+                        'audio': audio_convert, # путь к сконвертированному файлу
                         'name': name # имя пользователя
                       }
+
 
         else:
             # получить ошибки в случае невалидных данных.
             errors = error_messages(form)
             context = {'form':UploadFileForm(),
                        'errors': errors}
+
 
     return render(request, 'AudioApp/home.html',context=context)
 
