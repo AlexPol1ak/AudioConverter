@@ -1,11 +1,13 @@
 {% extends 'AudioApp/layout.html' %}
 {% load static %}
+{% load media %)
 
 {% block content %}
 
 <div class="features">
 <center>
     <h3>Ваши файлы: </h3><br>
+
     {% if userdata.0 == 'error404' %}
         <meta http-equiv="refresh" content="0;{% url 'error404' %}">
     {% else %}
@@ -15,13 +17,14 @@
             {% for u in page_obj.object_list %}
                 <details>
                     <summary><em>{{ forloop.counter}}.{{u.get_trek_name}}</em></summary>
-                    <a href="{% static u.get_convertable %}" download>
+                    <a href="{{MEDIA_URL}}{{ u.get_convertable }}" download>
                         <em>
                             {{u.get_trek_name}}.{{u.get_trek_format_convert}}
+
                         </em>
                     </a>&nbsp &nbsp -конвертирован
                     <br>
-                    <a href="{% static u.get_original %}" download>
+                        <a href="{{MEDIA_URL}}{{ u.get_original }}" download>
                         <em>
                             {{u.get_trek_name}}.{{u.get_trek_format_orig}}
                         </em>
