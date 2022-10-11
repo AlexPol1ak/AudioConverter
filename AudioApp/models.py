@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -22,6 +24,12 @@ class AudioData(models.Model):
     convertable_track = models.CharField(max_length=100, verbose_name='Сконвертированный трек')
     convertable_format = models.CharField(max_length=100, verbose_name='Формат сконвертированного трека')
     date = models.DateTimeField(auto_now_add=True, verbose_name='Дата конвертации')
+    original_track_size_b = models.IntegerField(verbose_name="Оригинальный трек. B")
+    original_track_size_mb = models.FloatField(verbose_name="Оригинальный трек. Mb")
+    convert_track_size_b = models.IntegerField(verbose_name="Сконвертированный трек. b")
+    convert_track_size_mb = models.FloatField(verbose_name="Сконвертированный трек Mb")
+    deleted = models.BooleanField(default=False, verbose_name="Удален")
+
 
 
     def __str__(self):
@@ -35,15 +43,15 @@ class AudioData(models.Model):
         """Настройки модели"""
         verbose_name = 'Трек пользователя'
         verbose_name_plural = 'Треки пользователя'
-        ordering = ['date']
+        ordering = ['date',]
 
     def get_convertable(self):
         """Возвращет относительный путь к сконвертированному треку."""
 
         # Для отображения путей к трекам в личном кабинете с тегом static
         if self.convertable_track:
-            audio = str(self.convertable_track) # << AudioApp/static//convertible_tracks/____.___
-            path = audio[audio.rfind('convertible_tracks'):] # << convertible_tracks/_____.___
+            audio = str(self.convertable_track) # << media//convertible_tracks/Пользватель/аудио.формат
+            path :str = audio[audio.rfind('convertible_tracks'):] # << convertible_tracks/Пользватель/аудио.формат
 
             return path
         else:
@@ -72,11 +80,10 @@ class AudioData(models.Model):
 
         # Для отображения путей к трекам в личном кабинете с тегом static
         if self.original_track:
-            audio = str(self.original_track)  # << AudioApp/static//convertible_tracks/____.___
-            path = audio[audio.rfind('original_track'):]  # << convertible_tracks/_____.___
-            print(path)
-
+            audio = str(self.original_track)  # << media/original_tracks/Пользватель/аудио.формат
+            path = audio[audio.rfind('original_track'):]  # << original_tracks/Пользватель/аудио.формат
             return path
+
         else:
             return None
 
@@ -89,3 +96,4 @@ class AudioData(models.Model):
             return frmt
         else:
             return None
+

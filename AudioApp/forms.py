@@ -19,7 +19,7 @@ class UploadFileForm(forms.ModelForm, forms.Form):
 
     format: forms.Form = forms.ChoiceField(choices=formats_tuple)
 
-    captcha = CaptchaField()
+    # captcha = CaptchaField()
 
     def clean_audio_file(self):
         """Проверка файла"""

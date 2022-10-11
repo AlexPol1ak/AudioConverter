@@ -36,6 +36,7 @@
     {% if trek_name %}
         <p>Click on the link to download file: {{ trek_name }}.{{ format }}</p>
         <a href="{{MEDIA_URL}}{{ audio }}" download>
+
         <button name='convert' class="btn btn-danger">Скачать</button>
         </a>
      {% else %}

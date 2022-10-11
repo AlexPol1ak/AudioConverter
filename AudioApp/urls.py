@@ -18,7 +18,8 @@ urlpatterns = [
     path('email-change/done/', views.email_change_done, name='email_change_ok'), # Страница успш. из. email. Кэш html 60 сек.
     path('delete-page/', views.del_page, name='del_page'), # Удаление данных
     path('page-not-found/', views.error404, name='error404'), # Несуществующая страница. Кэш предст. 1 суток.
-    path('footer/', views.footer, name='footer') # футер. Кэш предст. 1 суток.
+    path('footer/', views.footer, name='footer'), # футер. Кэш предст. 1 суток.
+    path('audio-delete/', views.del_audio, name='audio_delete') #Удаление трека
 
 ]
 

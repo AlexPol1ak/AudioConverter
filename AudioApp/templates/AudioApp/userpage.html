@@ -29,6 +29,11 @@
                             {{u.get_trek_name}}.{{u.get_trek_format_orig}}
                         </em>
                     </a>&nbsp &nbsp -оригинал
+                    <br>
+                    <form action="{% url 'audio_delete' %}" method="post">
+                        {% csrf_token %}
+                        <button name="audio_id" value="{{u.pk}}" type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
                 </details>
                 <br>
 

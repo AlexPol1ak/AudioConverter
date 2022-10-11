@@ -11,6 +11,7 @@ from django.utils.decorators import classonlymethod
 from django.views.decorators.cache import cache_page
 from django.views.generic import CreateView, ListView, UpdateView
 
+from AudioConverter.settings import MEDIA_URL
 from .forms import UploadFileForm, RegisterUserForm, LoginUserForm, InputPasswordForm
 from .models import AudioData
 from .utils.database import write_database
@@ -56,8 +57,7 @@ def home_page(request):
             # Информация о конвертированном файле для контекста
             trek_name: str = trek_dict['trek_name']
             trek_format: str = trek_dict['format']
-            audio_convert = trek_dict['path_convert']
-            # audio_convert :str = os.path.relpath(trek_dict['path_convert'], 'AudioApp\static')
+            audio_convert: str = os.path.relpath(trek_dict['path_convert'], 'media')
 
             # формируем контекст для представления
             context = {'form': form, # форма загрузки файла
@@ -151,7 +151,7 @@ class UserPage(LoginRequiredMixin, ListView,):
         # Url пользователя формируется по его логину. Проверяем совпадение url пользователя с его логином.
         # Возвращаем список аудио пользователя если он авторизован, url совпадет с логином
         if self.check_url() == True:
-            return AudioData.objects.filter(login=self.kwargs['slug'])
+            return AudioData.objects.filter(login=self.kwargs['slug'], deleted=False)
         else:
             return ['error404']
 
@@ -293,3 +293,25 @@ def footer(request):
 
     context = {'title': 'Cправочная информация'}
     return render(request, 'AudioApp/footer.html', context)
+
+
+@login_required
+def del_audio(request):
+    """Представление для удаления аудиофайла."""
+    if request.method == 'POST':
+        audio_id =request.POST.get('audio_id')
+
+        if audio_id:
+            audio = AudioData.objects.get(pk=audio_id)
+            # Позволяет пользователю удалить аудиофайл.Удаляет аудиофайл с диска, но не удаляет из запись о нем из бд.
+            # В БД отмечает как удаленный.
+            try:
+                os.remove(str(audio.convertable_track))
+                os.remove(str(audio.original_track))
+            except:
+                pass
+            finally:
+                audio.deleted = True
+                audio.save()
+
+    return redirect('user_account')
