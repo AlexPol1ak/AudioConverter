@@ -7,15 +7,18 @@
 {% cache 6000 conversion_error %}
 
 <div class="features">
-    <center><h3>{{title}}</h3>
+    <center>
+        <h3>{{title}}</h3>
         <br>
-        <p>Ой, что-то пошло не так. Нам не удалось преобразовать Ваш аудиофайл.<br>
-            Возможно аудиофайл поврежден или имеет неподдерживаемый формат.<br>
+        <p>Ой, что-то пошло не так. Нам не удалось преобразовать Ваш аудиофайл.
+            <br>
+            Возможно аудиофайл поврежден или имеет неподдерживаемый формат.
+            <br>
             Попробуйте еще раз.
         </p>
-        <p><input type="button" class="btn btn-warning" value="Попробовать снова" onclick='location.href="{% url "home" %}"'></p>
-
-
+        <p>
+            <input type="button" class="btn btn-warning" value="Попробовать снова" onclick='location.href="{% url "home" %}"'>
+        </p>
     </center>
 </div>
 

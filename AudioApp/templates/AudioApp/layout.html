@@ -30,25 +30,26 @@
     <main>
 
         {% if  request.user.is_authenticated%}
-<center
-    <h4><font size="5" color="white"> Вы авторизованы как {{ request.user.username}} </font>
-        <input type="button" class="btn btn-warning" value="Выйти" onclick='location.href="{% url "logout_user" %}"'>
-         <input type="button" class="btn btn-warning" value="Настройки" onclick='location.href="{% url "settings" %}"'>
-    </h4>
-</center>
+        <center
+            <h4>
+                <font size="5" color="white"> Вы авторизованы как {{ request.user.username}} </font>
+                <input type="button" class="btn btn-warning" value="Выйти" onclick='location.href="{% url "logout_user" %}"'>
+                <input type="button" class="btn btn-warning" value="Настройки" onclick='location.href="{% url "settings" %}"'>
+            </h4>
+        </center>
+        {% endif %}
 
-{% endif %}
         {% block content %}
 
         {% endblock %}
 
     </main>
 
-<div id="footer">
-    <p>Этот сайт является учебным проектом.
-        <a href="{% url 'footer' %}">Подробнее</a>
-    </p>
-</div>
+    <div id="footer">
+        <p>Этот сайт является учебным проектом.
+            <a href="{% url 'footer' %}">Подробнее</a>
+        </p>
+    </div>
 
 </body>
 

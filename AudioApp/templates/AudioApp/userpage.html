@@ -1,44 +1,51 @@
 {% extends 'AudioApp/layout.html' %}
 {% load static %}
-{% load media %)
+{% load media as song %)
 
 {% block content %}
 
 <div class="features">
-<center>
-    <h3>Ваши файлы: </h3><br>
-
-    {% if userdata.0 == 'error404' %}
+    <center>
+        <h3>Ваши файлы: </h3><br>
+<!--        Если у пользвователя еще нет аудио-->
+        {% if 'Not_audio' in userdata %}
         <meta http-equiv="refresh" content="0;{% url 'error404' %}">
-    {% else %}
+        {% else %}
 
         {% if userdata|length > 0 %}
-
+<!--            Перебор списка с аудио-->
             {% for u in page_obj.object_list %}
                 <details>
-                    <summary><em>{{ forloop.counter}}.{{u.get_trek_name}}</em></summary>
-                    <a href="{{MEDIA_URL}}{{ u.get_convertable }}" download>
-                        <em>
-                            {{u.get_trek_name}}.{{u.get_trek_format_convert}}
+                    <summary><em>{{ forloop.counter}}.{{u.audiofile_name}}</em></summary>
 
-                        </em>
-                    </a>&nbsp &nbsp -конвертирован
-                    <br>
-                        <a href="{{MEDIA_URL}}{{ u.get_original }}" download>
+                    <a href="{% url 'file_download' u.convert_aduio_relpath %}">
                         <em>
-                            {{u.get_trek_name}}.{{u.get_trek_format_orig}}
+                            {{u.convert_audio_fullname}}
                         </em>
-                    </a>&nbsp &nbsp -оригинал
+                    </a>&nbsp &nbsp -конвертирован ({{u.convert_size_mb}})Mb
+
                     <br>
+                    <br>
+
+                        <a href="{% url 'file_download' u.orig_aduio_relpath %}">
+                            <em>
+                            {{u.orig_audio_fullname}}
+                            </em>
+                        </a>&nbsp &nbsp -оригинал ({{u.orig_size_mb}})Mb
+
+                    <br>
+
                     <form action="{% url 'audio_delete' %}" method="post">
                         {% csrf_token %}
                         <button name="audio_id" value="{{u.pk}}" type="submit" class="btn btn-danger">Удалить</button>
                     </form>
+
                 </details>
+
                 <br>
 
             {% endfor %}
-
+<!--                Пагинация-->
                 {% if page_obj.has_other_pages %}
                     <div class="">
 
@@ -66,13 +73,12 @@
                 {% endif %}
 
 
-
         {% else %}
             <p>У Вас нет аудиофайлов.</p>
         {% endif %}
 
     {% endif %}
-</center>
+    </center>
 </div>
 
 {% endblock %}

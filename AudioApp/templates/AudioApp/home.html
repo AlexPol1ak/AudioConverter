@@ -33,18 +33,20 @@
 
 <div class="features">
     <center>
-    {% if trek_name %}
-        <p>Click on the link to download file: {{ trek_name }}.{{ format }}</p>
-        <a href="{{MEDIA_URL}}{{ audio }}" download>
+    {% if audio_name %}
+        <p>Click on the link to download file: {{ audio_name}} ({{size}} Mb)</p>
 
-        <button name='convert' class="btn btn-danger">Скачать</button>
-        </a>
+        <form action="{% url 'file_download' audio_name %}" method="post">
+            {% csrf_token %}
+            <button name="audio_path" value={{audio_path}} type="submit" class="btn btn-danger">Скачать</button>
+        </form>
+
      {% else %}
         <p>Файл не загружен</p>
         <button name='convert' class="btn btn-danger" disabled>Скачать</button>
     {% endif %}
-
     </center>
+
 </div>
 
 {% endblock %}
