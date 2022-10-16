@@ -1,5 +1,5 @@
 from django.views.decorators.cache import cache_page
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 
@@ -19,8 +19,8 @@ urlpatterns = [
     path('delete-page/', views.del_page, name='del_page'), # Удаление данных
     path('page-not-found/', views.error404, name='error404'), # Несуществующая страница. Кэш предст. 1 суток.
     path('footer/', views.footer, name='footer'), # футер. Кэш предст. 1 суток.
-    path('audio-delete/', views.del_audio, name='audio_delete') #Удаление трека
-
+    path('audio-delete/', views.del_audio, name='audio_delete'), #Удаление трека
+    re_path(r'^download/(?P<file_path>.*)/$', views.file_download, name='file_download'), # Скачивание аудио поль-лем
 ]
 
 
