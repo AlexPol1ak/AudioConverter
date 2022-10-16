@@ -7,16 +7,16 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView
 from django.shortcuts import redirect, render, reverse
 from django.urls import reverse_lazy
-from django.utils.decorators import classonlymethod
 from django.views.decorators.cache import cache_page
 from django.views.generic import CreateView, ListView, UpdateView
+from django.http import FileResponse
 
-from AudioConverter.settings import MEDIA_URL
+from AudioConverter.settings import MEDIA_ROOT
 from .forms import UploadFileForm, RegisterUserForm, LoginUserForm, InputPasswordForm
 from .models import AudioData
 from .utils.database import write_database
 from .utils.converter import converter
-from .utils.utils import error_messages
+from .utils.utils import error_messages, download_audio
 
 
 def home_page(request):
@@ -44,29 +44,27 @@ def home_page(request):
             # Получаем имя файла и выбраный пользвателем формат конвертации
             audio_orig :str = str(form.files['audio_file']).replace(' ', '_')
             frmt :str = request.POST.get('format')
-            audio_original_path = os.path.join(converter.storage_path, 'audio_files', audio_orig)
+            audio_original_path :str = os.path.join(converter.storage_path, 'audio_files', audio_orig)
 
             # Конвертирование аудиофайла и сохранение информации о нем в базу данных
             try:
-                trek_dict: dict = converter.convert(audio_original_path, frmt=frmt, name=login)
-                flag: bool = write_database(trek_dict)
+                audio_dict: dict = converter.convert(audio_original_path, frmt=frmt, name=login)
+                flag: bool = write_database(audio_dict)
             except:
                 # Открыть страницу при ошибке конвертирования
                 return render(request, 'AudioApp/conversion_error.html', {'title': 'Ошибка:('})
 
             # Информация о конвертированном файле для контекста
-            trek_name: str = trek_dict['trek_name']
-            trek_format: str = trek_dict['format']
-            audio_convert: str = os.path.relpath(trek_dict['path_convert'], 'media')
+            audio_convert_full_name: str = os.path.basename(audio_dict.get('path_convert', None))
+            audio_convert_path: str = audio_dict.get('path_convert', None)
+            size = str(audio_dict.get('convert_size_mb', 0))
 
             # формируем контекст для представления
             context = {'form': form, # форма загрузки файла
-                        'trek_name': trek_name, # имя сконвертированного файла
-                        'format': trek_format, # формат сконвертированного файла
-                        'audio': audio_convert, # путь к сконвертированному файлу
-                        'name': name # имя пользователя
+                        'audio_name': audio_convert_full_name, # имя сконвертированного файла
+                        'audio_path':audio_convert_path, # путь к сконвертированному файлу
+                        'size': size
                       }
-
 
         else:
             # получить ошибки в случае невалидных данных.
@@ -76,6 +74,32 @@ def home_page(request):
 
 
     return render(request, 'AudioApp/home.html',context=context)
+
+
+def file_download(request, file_path :str ):
+    """Представление для скачаивания пользвателем аудиофайлов."""
+    # Убираем полный путь к файлу из ссылки.
+    # Если запрос на скачивание поступает с home/
+    if request.method == 'POST':
+        audio_path :str or None = request.POST.get('audio_path', None)
+
+    # Если запрос на скачивание аудио поступает с личного кабинет
+    # Позволяем скачивать только свои аудио и только авториз. польз-ям.
+    elif request.method != 'POST' and os.path.isabs(file_path) == False\
+           and request.user.is_authenticated and request.user.username in file_path:
+            audio_path :str or None = os.path.abspath(os.path.join(MEDIA_ROOT, file_path))
+
+    else:
+        audio_path :str or None = None
+
+    if audio_path:
+        try:
+            response :FileResponse = download_audio(audio_path=audio_path)
+            return response
+        except Exception:
+            return redirect('error404')
+    else:
+        return render(request, 'AudioApp/conversion_error.html', {'title': 'Ошибка:('})
 
 
 def user_account(request):
@@ -153,7 +177,7 @@ class UserPage(LoginRequiredMixin, ListView,):
         if self.check_url() == True:
             return AudioData.objects.filter(login=self.kwargs['slug'], deleted=False)
         else:
-            return ['error404']
+            return ['Not_audio']
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """Формирует контекст"""
@@ -299,15 +323,15 @@ def footer(request):
 def del_audio(request):
     """Представление для удаления аудиофайла."""
     if request.method == 'POST':
-        audio_id =request.POST.get('audio_id')
+        audio_id =request.POST.get('audio_id', None)
 
         if audio_id:
             audio = AudioData.objects.get(pk=audio_id)
             # Позволяет пользователю удалить аудиофайл.Удаляет аудиофайл с диска, но не удаляет из запись о нем из бд.
             # В БД отмечает как удаленный.
             try:
-                os.remove(str(audio.convertable_track))
-                os.remove(str(audio.original_track))
+                os.remove(audio.orig_audio_path())
+                os.remove(audio.convert_audio_path())
             except:
                 pass
             finally:
@@ -315,3 +339,5 @@ def del_audio(request):
                 audio.save()
 
     return redirect('user_account')
+
+
