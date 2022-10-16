@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+import configparser
+
+config = configparser.ConfigParser(interpolation=None)
+config.read("AudioConverter/config.ini")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(&#+8vw_ums8=qjv*d@#1*8ul!f@ijw1!xx$)(%ayc8(q3r^b@'
+SECRET_KEY = config['Audio_Converter']['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,9 +91,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
         # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'zarjrw4z_django',
-        # 'USER': 'zarjrw4z_django',
-        # 'PASSWORD': 'c2d&eT0o',
+        # 'NAME': config['Audio_Converter']['BD_NAME'],
+        # 'USER': config['Audio_Converter']['BD_USER'],
+        # 'PASSWORD': config['Audio_Converter']['PASSWORD'],
         # 'HOST': 'localhost',
         # 'PORT': '3306',
     }
