@@ -19,7 +19,7 @@ class UploadFileForm(forms.ModelForm, forms.Form):
 
     format: forms.Form = forms.ChoiceField(choices=formats_tuple)
 
-    # captcha = CaptchaField()
+    captcha = CaptchaField()
 
     def clean_audio_file(self):
         """Проверка файла"""
@@ -74,7 +74,7 @@ class LoginUserForm(AuthenticationForm):
 
 
 class InputPasswordForm(forms.Form):
-    """Представление для ввода пароля при подтверждений действий."""
+    """Форма для ввода пароля при подтверждений действий."""
 
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
