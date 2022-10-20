@@ -6,6 +6,8 @@ The website provides functionality for converting audio.
 Authorized users can store original and converted audio files in their personal area, download audio, and delete audio.
 In guest mode, only converting and downloading audio is available, without storage.
 <br>
+Hosting uses a MySQL database.
+<br>
 Supported conversion formats: ac3, asf, flac, mp3, mp4, mov, ogg, wav.
 <br>
 Stack: Python, Django, codec ffmpeg, pydub, SQlite, MySQL, html, css, configparser.
